@@ -4,7 +4,7 @@ import email
 import imaplib
 
 def update_saved_content():
-    with open("../config") as f:
+    with open("config") as f:
         lines = f.read().split("\n")
         f.close()
         username     = lines[0]
@@ -52,7 +52,7 @@ def update_saved_content():
 
                             if content_type == "text/plain" and "attachment" not in content_disposition:
                                 ## update stored message
-                                with open("../curr_message.txt", "w") as f2:
+                                with open("curr_message.txt", "w") as f2:
                                     f2.write(body)
                                     f2.close()
 
