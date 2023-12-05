@@ -2,7 +2,7 @@ import pygame
 import os
 from eclient import update_saved_content
 
-# # temp for debugging:
+# temp for debugging:
 # def update_saved_content():
 #     pass
 
@@ -14,26 +14,24 @@ screen = pygame.display.set_mode((W,H))
 clock = pygame.time.Clock()
 running = True
 
-
-
 textcol = (0,0,0)
 bgcol = (255,255,255)
 gap = 10
 fontsize = 30
 
+font = pygame.font.SysFont("chilanka", fontsize)
+
 def render_message():
     message = open("curr_message.txt").read()
     img = "" ## hacky by works:
     if os.path.exists("curr_img.JPG"):
-        img = "../curr_img.JPG"
-    if os.path.exists("../curr_img.jpg"):
-        img = "../curr_img.jpg"
-    if os.path.exists("../curr_img.jpeg"):
-        img = "../curr_img.jpeg"
-    if os.path.exists("../curr_img.png"):
-        img = "../curr_img.png"
-
-    font = pygame.font.SysFont("chilanka", 30)
+        img = "curr_img.JPG"
+    if os.path.exists("curr_img.jpg"):
+        img = "curr_img.jpg"
+    if os.path.exists("curr_img.jpeg"):
+        img = "curr_img.jpeg"
+    if os.path.exists("curr_img.png"):
+        img = "curr_img.png"
 
     screen.fill(bgcol)
 
@@ -62,6 +60,9 @@ def render_message():
         w = r.width * ratio
         screen.blit(pygame.transform.scale(i, (w, h)), ((W-w) // 2, y))
 
+def render_opts():
+    screen.blit(font.render("Force Refresh", True, textcol), (50, 50))
+    screen.blit(font.render("Shutdown Device", True, textcol), (50, 50+(50+fontsize)*1))
 
 print("updating...")
 update_saved_content()  # connect to email server
@@ -71,16 +72,38 @@ print("updated")
 counter = 0
 fps = 10
 checking_interval = 30  # seconds
+state = 0
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            x, y = event.pos
+
+            if state == 0:  # normal / display
+                state = 1
+                counter = 0  # reset timer
+                screen.fill(bgcol)
+                render_opts()
+
+            elif state == 1:  # options menu
+                if y < 50+30+25: # Force Refresh
+                    print("force refreshing")
+                    update_saved_content() ## connect to email server
+                    state = 0
+                    screen.fill(bgcol)
+                    render_message()
+                elif y < 50+30+50+30+25:
+                    print("TODO: shutdown device")
+
 
     counter += 1
     if counter > checking_interval*fps:
+        state = 0
         counter = 0
         print("updating...")
         update_saved_content() ## connect to email server
+        screen.fill(bgcol)
         render_message()
         print("updated")
 

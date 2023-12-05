@@ -2,6 +2,7 @@
 
 import email
 import imaplib
+import os
 
 def update_saved_content():
     with open("config") as f:
@@ -55,12 +56,28 @@ def update_saved_content():
                                 with open("curr_message.txt", "w") as f2:
                                     f2.write(body)
                                     f2.close()
+                                try:
+                                    os.remove("curr_img.JPG")
+                                except FileNotFoundError:
+                                    pass
+                                try:
+                                    os.remove("curr_img.jpg")
+                                except FileNotFoundError:
+                                    pass
+                                try:
+                                    os.remove("curr_img.jpeg")
+                                except FileNotFoundError:
+                                    pass
+                                try:
+                                    os.remove("curr_img.png")
+                                except FileNotFoundError:
+                                    pass
 
                             elif "attachment" in content_disposition:
                                 # download attachment
                                 filename = part.get_filename()
                                 if filename:
-                                    open("../curr_img."+filename.split(".")[-1], "wb").write(part.get_payload(decode=True))
+                                    open("curr_img."+filename.split(".")[-1], "wb").write(part.get_payload(decode=True))
 
                     else:
                         print("non-multipart messages not supported")
